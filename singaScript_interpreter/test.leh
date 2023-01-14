@@ -1,0 +1,33 @@
+# Arithmetic #
+
+1 + 2 * 3 - (1.5 ^ 2);
+
+# Declarations #
+
+chope 1 tables can liao
+chope 2 benches can liao
+
+chope 5 alex can liao
+chope 1 you can liao
+chope 10 grandma can liao
+
+# Conditionals #
+
+tables same benches;
+tables not same benches;
+
+alex better than you;
+you lousier than grandma;
+
+alex;
+
+# If - else #
+
+sekali you lousier than alex then PRINT("Lies");
+
+
+# While #
+
+where got time benches not same 1 then chope benches -1 benches;
+
+where got time grandma lousier than 1 then chope grandma -1 grandma;
