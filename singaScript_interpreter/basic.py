@@ -143,9 +143,8 @@ KEYWORDS = [
     'FOR',
     'TO',
     'STEP',
-    'where', #'WHILE'
-    'got',
-    'time',
+    'keep', #'WHILE'
+    'on',
     'FUN',
     'then', #'THEN'
     'END',
@@ -730,10 +729,12 @@ class Parser:
             return res.success(BreakNode(pos_start, self.current_tok.pos_start.copy()))
 
         expr = res.register(self.expr())
+        
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'RETURN', 'CONTINUE', 'BREAK', 'chope', 'sekali', 'FOR', 'where', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                #"Expected 'RETURN', 'CONTINUE', 'BREAK', 'chope', 'sekali', 'FOR', 'where', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                "Expected 'chope', 'sekali', 'keep on', int, float, identifier, '+', '-', '(', '[' or 'not'"
             ))
         return res.success(expr)
 
@@ -772,7 +773,8 @@ class Parser:
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'chope', 'sekali', 'FOR', 'where', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                #"Expected 'chope', 'sekali', 'FOR', 'where', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                "Expected 'chope', 'sekali', 'keep on', int, float, identifier, '+', '-', '(', '[' or 'not'"
             ))
 
         return res.success(node)
@@ -786,17 +788,20 @@ class Parser:
             self.advance()
 
             node = res.register(self.comp_expr())
+            
+
             if res.error:
                 return res
             return res.success(UnaryOpNode(op_tok, node))
 
         node = res.register(self.bin_op(
             self.arith_expr, (TT_EE, TT_NE, TT_LT, TT_GT, TT_LTE, TT_GTE)))
-
+        
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected int, float, identifier, '+', '-', '(', '[', 'sekali', 'FOR', 'where', 'FUN' or 'NOT'"
+                #"Expected int, float, identifier, '+', '-', '(', '[', 'sekali', 'FOR', 'where', 'FUN' or 'NOT'"
+                "Expected int, float, identifier, '+', '-', '(', '[', 'sekali', 'keep on' or 'not'"
             ))
 
         return res.success(node)
@@ -843,7 +848,8 @@ class Parser:
                 if res.error:
                     return res.failure(InvalidSyntaxError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected ')', 'chope', 'sekali', 'FOR', 'where', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                        #"Expected ')', 'chope', 'sekali', 'FOR', 'where', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                        "Expected ')', 'chope', 'sekali', 'keep on', int, float, identifier, '+', '-', '(', '[' or 'not'"
                     ))
 
                 while self.current_tok.type == TT_COMMA:
@@ -919,7 +925,7 @@ class Parser:
                 return res
             return res.success(for_expr)
 
-        elif tok.matches(TT_KEYWORD, 'where'):
+        elif tok.matches(TT_KEYWORD, 'keep'):
             while_expr = res.register(self.while_expr())
             if res.error:
                 return res
@@ -933,7 +939,8 @@ class Parser:
 
         return res.failure(InvalidSyntaxError(
             tok.pos_start, tok.pos_end,
-            "Expected int, float, identifier, '+', '-', '(', '[', sekali', 'FOR', 'where got time', 'FUN'"
+            #"Expected int, float, identifier, '+', '-', '(', '[', sekali', 'FOR', 'where got time', 'FUN'"
+            "Expected int, float, identifier, '+', '-', '(', '[', sekali', 'keep on'"
         ))
 
     def list_expr(self):
@@ -958,7 +965,8 @@ class Parser:
             if res.error:
                 return res.failure(InvalidSyntaxError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected ']', 'chope', 'sekali', 'FOR', 'while got time', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                    #"Expected ']', 'chope', 'sekali', 'FOR', 'where got time', 'FUN', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                    "Expected ']', 'chope', 'sekali', 'keep on', int, float, identifier, '+', '-', '(', '[' or 'not'"
                 ))
 
             while self.current_tok.type == TT_COMMA:
@@ -1198,15 +1206,12 @@ class Parser:
     def while_expr(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'where') or not self.next_tok.matches(TT_KEYWORD, 'got') or not self.next_next_tok.matches(TT_KEYWORD, 'time'):
-            print("here")
+        if not self.current_tok.matches(TT_KEYWORD, 'keep') or not self.next_tok.matches(TT_KEYWORD, 'on'):
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'where got time'"
+                f"Expected 'keep on'"
             ))
 
-        res.register_advancement()
-        self.advance()
         res.register_advancement()
         self.advance()
         res.register_advancement()
@@ -1630,8 +1635,8 @@ class Number(Value):
 
 
 Number.null = Number(0)
-Number.false = Number(0)
-Number.true = Number(1)
+Number.false = Number(False)
+Number.true = Number(True)
 Number.math_PI = Number(math.pi)
 
 
@@ -1846,8 +1851,8 @@ class BuiltInFunction(BaseFunction):
     #####################################
 
     def execute_print(self, exec_ctx):
-        print(str(exec_ctx.symbol_table.get('value')))
-        return RTResult().success(Number.null)
+        #print(str(exec_ctx.symbol_table.get('value')))
+        return RTResult().success(String(str(exec_ctx.symbol_table.get('value'))))
     execute_print.arg_names = ['value']
 
     def execute_print_ret(self, exec_ctx):
@@ -2069,6 +2074,7 @@ class Interpreter:
     def visit(self, node, context):
         method_name = f'visit_{type(node).__name__}'
         method = getattr(self, method_name, self.no_visit_method)
+        
         return method(node, context)
 
     def no_visit_method(self, node, context):
@@ -2212,7 +2218,7 @@ class Interpreter:
     def visit_ForNode(self, node, context):
         res = RTResult()
         elements = []
-
+        
         start_value = res.register(self.visit(node.start_value_node, context))
         if res.should_return():
             return res
@@ -2348,10 +2354,10 @@ class Interpreter:
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set("NULL", Number.null)
-global_symbol_table.set("FALSE", String.false)
-global_symbol_table.set("TRUE", String.true)
+global_symbol_table.set("False", Number.false)
+global_symbol_table.set("True", Number.true)
 global_symbol_table.set("MATH_PI", Number.math_PI)
-global_symbol_table.set("PRINT", BuiltInFunction.print)
+global_symbol_table.set("simi", BuiltInFunction.print)
 global_symbol_table.set("PRINT_RET", BuiltInFunction.print_ret)
 global_symbol_table.set("INPUT", BuiltInFunction.input)
 global_symbol_table.set("INPUT_INT", BuiltInFunction.input_int)
@@ -2374,7 +2380,7 @@ def run(fn, text):
     tokens, error = lexer.make_tokens()
     if error:
         return None, error
-
+        
     # Generate AST
     parser = Parser(tokens)
     ast = parser.parse()
@@ -2385,6 +2391,7 @@ def run(fn, text):
     interpreter = Interpreter()
     context = Context('<program>')
     context.symbol_table = global_symbol_table
-    result = interpreter.visit(ast.node, context)
 
+    result = interpreter.visit(ast.node, context)
+    
     return result.value, result.error

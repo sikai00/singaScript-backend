@@ -23,11 +23,23 @@ alex;
 
 # If - else #
 
-sekali you lousier than alex then PRINT("Lies");
+sekali you lousier than alex then simi("Lies");
 
 
 # While #
 
-where got time benches not same 1 then chope benches -1 benches;
+keep on benches not same 1 then chope benches -1 benches;
 
-where got time grandma lousier than 1 then chope grandma -1 grandma;
+keep on grandma lousier than 1 then chope grandma -1 grandma;
+
+# Errors #
+
+FUN test(x, y) -> x not same y; 
+
+simi("yo");
+
+test(9,9);
+
+True;
+
+False;

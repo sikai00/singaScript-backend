@@ -3,6 +3,7 @@ const { exec } = require("child_process");
 const Joi = require("joi");
 const { nanoid } = require("nanoid");
 const { createLahFile, deleteLahFile } = require("./fileutils");
+const { checkExceptionOccur } = require("./submitutil");
 
 const router = express.Router();
 const reqSchema = Joi.object({ userInput: Joi.string().required() });
@@ -17,7 +18,8 @@ router.post("/", function (req, res) {
   const { error, value } = reqSchema.validate(req.body);
 
   if (error) {
-    res.status(404).send(error.details[0].message);
+    res.status(405).send(error.details[0].message);
+    return;
   }
 
   runCode(res, value.userInput);
@@ -42,12 +44,11 @@ function runCode(res, value) {
             console.error(`stderr: ${stderr}`);
             return;
           }
-
-          const returnResult = { results: stdout };
-
           deleteLahFile(tmpFileName);
 
-          res.json(returnResult);
+          exceptionOccurred = checkExceptionOccur(stdout);
+          const output = exceptionOccurred ? [stdout] : JSON.parse(stdout);
+          res.json({ output });
         }
       )
     )
