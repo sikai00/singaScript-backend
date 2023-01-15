@@ -7,7 +7,7 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: "https://singa-script.vercel.app/home" }));
+app.use(cors({ origin: "http://singa-script.vercel.app" }));
 app.use(logger("dev"));
 
 app.get("/", function (req, res) {
