@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000;
 app.use(
   cors({
     origin: "https://singa-script.vercel.app/home",
+    credentials: true,
   })
 );
 app.use(logger("dev"));
