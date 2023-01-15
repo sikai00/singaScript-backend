@@ -19,8 +19,8 @@ const testCaseSchema = Joi.object({
 });
 const reqSchema = Joi.object({
   challengeIndex: Joi.number().required(),
-  testCases: Joi.array().items(testCaseSchema),
-  userInput: Joi.string(),
+  testCases: Joi.array().items(testCaseSchema).required(),
+  userInput: Joi.string().required(),
 });
 
 router.use(express.json());
