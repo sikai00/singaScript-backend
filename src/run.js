@@ -18,7 +18,7 @@ router.post("/", function (req, res) {
   const { error, value } = reqSchema.validate(req.body);
 
   if (error) {
-    res.status(405).send(error.details[0].message);
+    res.status(400).send(error.details[0].message);
     return;
   }
 
