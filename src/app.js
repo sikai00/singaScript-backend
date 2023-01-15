@@ -28,8 +28,8 @@ app.get("/", function (req, res) {
   res.send("Hello World!");
 });
 
-app.use("/run", cors(corsOptions), run);
-app.use("/submit", cors(corsOptions), submit);
+app.use("/run", run);
+app.use("/submit", submit);
 
 app.listen(port, function () {
   console.log(
