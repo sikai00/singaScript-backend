@@ -22,6 +22,7 @@ const corsOptions = {
 };
 
 app.use(logger("dev"));
+app.use(cors(corsOptions));
 
 app.get("/", function (req, res) {
   res.send("Hello World!");
