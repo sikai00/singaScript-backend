@@ -7,6 +7,20 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
+const whitelist = [
+  "https://singa-script.vercel.app/",
+  "https://singa-script.vercel.app/home",
+];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+
 app.use(logger("dev"));
 app.use(
   cors({
@@ -18,8 +32,8 @@ app.get("/", function (req, res) {
   res.send("Hello World!");
 });
 
-app.use("/run", run);
-app.use("/submit", submit);
+app.use("/run", cors(corsOptions), run);
+app.use("/submit", cors(corsOptions), submit);
 
 app.listen(port, function () {
   console.log(
